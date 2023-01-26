@@ -1,0 +1,266 @@
+<div class="images-container">
+            <div class="featured {% if product.images.size == 1 %}full-width{% endif %}" id="ProductPhoto">
+              {%- assign image = current_variant.featured_image | default: product.featured_image -%}
+              {%- assign image_width = image.width | append: 'x' -%}
+              {%- assign image_highresolution = image | img_url: image_width -%}
+              <div class="featured-container featured-container-{{ section.id }} {% if section.settings.product_featured_zoom_enable %}featured-zoom{% endif %}" data-zoom="{{ section.settings.product_featured_zoom_enable }}" data-lightbox="{{ section.settings.product_featured_lightbox_enable }}">
+                <a href="" class="card__image-container">
+                  {% assign image_widths = '85,100,200,295,394,590,720,800' %}
+                  {% include 'theme-rias' %}
+                  <div class="productimage-limit" style="max-width:{{ image.width }}px">
+                    <img id="ProductImage" class="productImageZoom lazyload"
+                      src="{{ image | img_url: '394x' }}"
+                      data-zoom-image ={{ image | img_url: '1024x1024' }}
+                      data-id="{{ section.id }}"
+                      data-src="{{ image_url_pattern }}"
+                      data-widths="[{{ image_widths }}]"
+                      data-aspectratio="{{ image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-position="{{ image.position | minus: 1 }}"
+                      data-max-width="{{ image.width }}"
+                      alt="{{ image.alt | escape }}">
+                    <noscript>
+                      <img src="{{ image | img_url: '590x' }}" alt="{{ image.alt | escape }}">
+                    </noscript>
+                  </div>
+                </a>
+              </div>
+            </div>
+            {% comment %}
+              Create thumbnails if we have more than one product image
+            {% endcomment %}
+            {% unless product.images.size == 1 %}
+              <div class="thumbnails" {% if section.settings.thumbnails_placement == 'hide' %}style="display:none;"{% endif %}>
+                <ul class="productThumbZoom" id="ProductThumbs-{{ section.id }}">
+
+                  {% for image in product.images %}
+                    {%- assign image_width = image.width | append: 'x' -%}
+                    {%- assign image_highresolution = image | img_url: image_width -%}
+                    {%- assign active_image = current_variant.featured_image | default: product.featured_image -%}
+                    <li>
+                      <a href="" class="product-single__thumbnail--{{ section.id }} {% if image == active_image %}active{% endif %}" data-image-id="{{ image.id }}">
+                        {% assign image_widths = '85,100,200,295,394,590,720,800' %}
+                        {% include 'theme-rias' %}
+                        <img class="lazyload"
+                          src="{{ image | img_url: '1024x1024' }}"
+                          data-default="{{ image | img_url: '394x' }}"
+                          data-src="{{ image_url_pattern }}"
+                          data-src-pattern="{{ image_url_pattern }}"
+                          data-widths="[{{ image_widths }}]"
+                          data-aspectratio="{{ image.aspect_ratio }}"
+                          data-sizes="auto"
+                          data-position="{{ forloop.index0 }}"
+                          data-max-width="{{ image.width }}"
+                          alt="{{ image.alt | escape }}">
+                        <noscript>
+                          <img src="{{ image | img_url: '100x' }}" alt="{{ image.alt | escape }}">
+                        </noscript>
+                      </a>
+                    </li>
+                  {% endfor %}
+
+                </ul>
+              </div>
+            {% endunless %}
+          </div>
+        </div>
+
+        <aside class="product-aside">
+          <div class="purchase-box {% if section.settings.product_box_padding %}padding-box{% endif %}" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+            <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+            <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+            {% comment %}
+              ID addToCartForm is a selector for the ajax cart plugin
+            {% endcomment %}
+            <form action="/cart/add" method="post" enctype="multipart/form-data" id="AddToCartForm" class="form-vertical product-form product-form-{{ section.id }}" data-section="{{ section.id }}">
+
+              <div class="product-title">
+                <h1 itemprop="name">{{ product.title }}</h1>
+                {% if section.settings.show_vendors %}
+                  <span class="vendor">{{ product.vendor | link_to_vendor }}</span>
+                {% endif %}
+              </div>
+
+              <div class="selection-wrapper price product-single__price-{{ section.id }}">
+                <span class="money" id="ProductPrice-{{ section.id }}" itemprop="price" content="{{ current_variant.price | money_without_currency | remove: ',' }}">{{ current_variant.price | money }}</span>
+                {% if current_variant.compare_at_price > current_variant.price %}
+                  <p id="ComparePrice-{{ section.id }}" style="display:block;">
+
+                    {{ 'products.product.compare_at' | t }} <span class="money">{{ current_variant.compare_at_price | money }}</span>
+                  </p>
+                {% else %}
+                  <p id="ComparePrice-{{ section.id }}" style="display:none;">
+                    {{ 'products.product.compare_at' | t }} <span class="money">{{ current_variant.compare_at_price | money }}</span>
+                  </p>
+                {% endif %}
+              </div>
+
+              {% comment %}
+                Collection of variant options
+              {% endcomment %}
+              {% unless product.has_only_default_variant %}
+                <div class="selection-wrapper variant js">
+                  <div class="variant-grid">
+                    {% for option in product.options_with_values %}
+                      <div class="selector-wrapper">
+                        <label for="SingleOptionSelector-{{ forloop.index0 }}">
+                          {{ option.name }}
+                        </label>
+
+                        <select class="single-option-selector single-option-selector-{{ section.id }}" id="SingleOptionSelector-{{ forloop.index0 }}" data-name="{{ option.name }}" data-index="option{{ forloop.index }}">
+                          {% for value in option.values %}
+                            <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
+                              {{ value }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endunless %}
+
+              {% comment %}
+                Primary variant select controlled JS
+              {% endcomment %}
+              <div class="selection-wrapper variant no-js">
+                <div class="selector-wrapper full-width">
+                  <select name="id" id="ProductSelect-{{ section.id }}" data-section="{{ section.id }}" class="product-form__variants no-js">
+                    {% for variant in product.variants %}
+                      {% if variant.available %}
+                        <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}" data-sku="{{ variant.sku }}">
+                          {{ variant.title }} - {{ variant.price | money_with_currency }}
+                        </option>
+                      {% else %}
+                        <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+
+              <div class="error cart-error cart-error-{{ section.id }}"></div>
+              <div class="selection-wrapper cart">
+                {% if section.settings.product_quantity_enable %}
+                  <div class="selector-wrapper quantity quantity-{{ section.id }}" {% unless current_variant.available %}style="display:none;"{% endunless %}>
+                    <label for="Quantity">{{ 'products.product.quantity' | t }}</label>
+                    <div class="quantity-select quantity-select-{{ section.id }}">
+                      <div class="button-wrapper">
+                        <button class="adjust adjust-minus">-</button>
+                      </div>
+                      <div class="input-wrapper">
+                        <input type="text" class="quantity" value="1" min="1" pattern="[0-9]*" name="quantity" id="Quantity">
+                      </div>
+                      <div class="button-wrapper">
+                        <button class="adjust adjust-plus">+</button>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="button-wrapper">
+                  <button type="submit" name="add" id="AddToCart-{{ section.id }}" class="button solid {% unless current_variant.available %}disabled{% endunless %}" {% unless current_variant.available %}disabled{% endunless %}>
+                    <span id="AddToCartText-{{ section.id }}">
+                      {% unless current_variant.available %}
+                        {{ 'products.product.sold_out' | t }}
+                      {% else %}
+                        {{ 'products.product.add_to_cart' | t }}
+                      {% endunless %}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+         <div class="wishy-placeholder"></div>
+          {% if section.settings.show_share_buttons %}
+            {% include 'social-share' %}
+          {% endif %}
+          <div class="pic1"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/digital_songbook.png?14339516088236053642 " height="110px" width="100px"></div>
+     <a href="https://play.google.com/store/apps/details?id=com.platinumkaraoke.digitalsongbook">
+   <div class="pic2"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/googleplay-logo.png?14339516088236053642 " height="90px" width="90px"></div>
+  </a>
+   
+       <a href="https://itunes.apple.com/ph/app/the-platinum-karaoke/id658194590?mt=8">
+     <div class="pic3"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/apple-Store-logo.png?14339516088236053642" height="90px" width="90px"></div>
+  </a>
+
+        <style>
+          .tb1{background-color:green;
+          
+          }
+          
+          
+           .pic2 img{
+          background-color:pink;
+             float:left;
+              bottom: 100px;
+            left:100px;
+            position: relative;
+           }
+     
+           .pic3 img{
+          background-color:pink;
+             bottom:70px;
+             left:10px;
+            position: relative;
+           }
+     
+          
+            </style>
+        
+       
+        
+        </aside>
+      </div> 
+          <div class="description rte" itemprop="description">
+            {{ product.description }}
+            <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+    </div>
+       </div>
+  </section>
+
+  {% comment %}
+    Related products
+  {% endcomment %}
+  {% for block in section.blocks %}
+    <div class="product-block-container" {{ block.shopify_attributes }}>
+      {% case block.type %}
+        {% when 'related_products' %}
+          <div class="block-container">
+            {% include 'related-products' %}
+          </div>
+
+        {% when 'product_collection'}
+          {%- assign product_collection_count = '4' -%}
+          {%- assign collection_count = '4' -%}
+          <div class="simple-collection layout-{{ collection_count }}">
+            <div class="wrapper">
+              <header>
+                {% if block.settings.title != blank %}
+                  <h4>{{ block.settings.title | escape }}</h4>
+                {% endif %}
+                {% if block.settings.button_link != blank and block.settings.button_label != blank %}
+                  <a href="{{ block.settings.button_link }}" class="button outline">{{ block.settings.button_label | escape }}</a>
+                {% endif %}
+              </header>
+              <div class="product-container">
+                {%- assign collection = collections[block.settings.collection] -%}
+                {%- assign product_limit = collection_count -%}
+                {% for product in collection.products limit: product_limit  %}
+                  {% include 'product-grid-item' %}
+                {% else %}
+                  {% for i in (1..product_limit) %}
+                    {% include 'placeholder-product-grid-item' %}
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+      {% endcase %}
+    </div>
+  {% endfor %}
+
+</div>

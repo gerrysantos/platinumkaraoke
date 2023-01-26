@@ -1,0 +1,150 @@
+{{ 'swatch-style.css'| asset_url | stylesheet_tag}}
+
+{%  if shop.metafields.quickview-swatch.themestyle == "theme1" %}
+{{ 'roundstyle.css'| asset_url | stylesheet_tag}}
+{% endif %}
+
+{%  if shop.metafields.quickview-swatch.themestyle == "theme2" %}
+{{ 'rectanglestyle.css'| asset_url | stylesheet_tag}}
+{% endif %}
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+{% comment %}
+  Set the extension of your color files below. Use 'png', 'jpeg', 'jpg' or 'gif'.
+{% endcomment %}
+
+{% assign file_extension = 'png' %}
+
+{% if swatch == blank %}
+<div class="swatch error">
+  <p>You must include the snippet swatch.liquid with the name of a product option.</p> 
+  <p>Use: <code>{% raw %}{% include 'swatch' with 'name of your product option here' %}{% endraw %}</code></p>
+  <p>Example: <code>{% raw %}{% include 'swatch' with 'Color' %}{% endraw %}</code></p>
+</div>
+{% else %}
+
+{% assign found_option = false %}
+{% assign is_color = false %}
+{% assign option_index = 0 %}
+
+{% for option in product.options %}
+  {% if option == swatch %}
+    {% assign found_option = true %}
+    {% assign option_index = forloop.index0 %}
+    <style>
+      label[for="product-select-option-{{ option_index }}"] { display: none; }
+      #product-select-option-{{ option_index }} { display: none; }
+      #product-select-option-{{ option_index }} + .custom-style-select-box { display: none !important; }
+    </style>
+    <script>$(window).load(function() { $('.selector-wrapper:eq({{ option_index }})').hide(); });</script>
+    {% assign downcased_option = swatch | downcase %}
+    {% if downcased_option contains 'color' or downcased_option contains 'colour' %}
+      {% assign is_color = true %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% unless found_option %}
+{% else %}
+<div class="swatch clearfix" data-option-index="{{ option_index }}">
+  <div class="header">{{ swatch }}</div>
+  {% assign values = '' %}
+  {% for variant in product.variants %}
+    {% assign value = variant.options[option_index] %}
+    {% unless values contains value %}
+      {% assign values = values | join: ',' %}
+      {% assign values = values | append: ',' | append: value %} 
+      {% assign values = values | split: ',' %}
+  
+      <div data-value="{{ value | escape }}" class="swatch-element {% if is_color %}color {% endif %}{{ value | handle }} {% if variant.available %}available{% else %}soldout{% endif %}">
+        {% if is_color %}
+        <div class="tooltip">{{ value }}</div>
+        {% endif %}
+        <input id="swatch-{{ option_index }}-{{ value | handle }}" type="radio" name="option-{{ option_index }}" value="{{ value | escape }}"{% if forloop.first %} checked{% endif %} {% unless variant.available %}disabled{% endunless %} />
+        {% if is_color %}
+       
+       <label for="swatch-{{ option_index }}-{{ value | handle }}" id="color_swatch-{{option_index }}-{{ value | handle }}">
+          <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+         
+       
+<!-- Get Swatches value from quick view App here -->  
+{% assign metafield_val = shop.metafields.quickview-swatch[value] %}
+<script>
+  var colorjson = '{{ metafield_val }}';
+  var color_div_id = "#color_swatch-{{option_index }}-{{ value | handle }}";
+  var color_code = "";
+  var color_obj = "";
+  
+  if(colorjson == "") {
+    
+   	 color_code = "{{ value | split: ' ' | last | handle }}";
+     jQuery(color_div_id).css("background-color",color_code);
+    
+  } else {
+    
+  	 color_obj = jQuery.parseJSON(colorjson);
+    
+    //for color img
+    if(color_obj.type == "color_image") 
+    {
+      imageUrl = color_obj.color_img;   
+      jQuery(color_div_id).css('background-image', 'url(' + imageUrl + ')');
+    }
+    
+    //for one color
+    if(color_obj.type == "one_color")
+    {
+       color_code = color_obj.color_code1;
+       jQuery(color_div_id).css("background-color",color_code);
+    }
+    
+    //for two color
+    if(color_obj.type == "two_color") 
+    {
+      color_code1 = color_obj.color_code1;
+      color_code2 = color_obj.color_code2;
+      
+      jQuery(color_div_id).css('background','linear-gradient(to bottom,'+color_code1+' 0%,'+color_code1+' 50%,#000000 50%,'+color_code2+' 50%,'+color_code2+' 100%)'); 
+    }
+  }
+</script>
+<!-- ends here -->
+        
+        {% else %}
+        <label for="swatch-{{ option_index }}-{{ value | handle }}">
+          {{ value }}
+          <img class="crossed-out" src="{{ 'soldout.png' | asset_url }}" />
+        </label>
+        {% endif %}
+      </div>
+    {% endunless %}
+    {% if variant.available %}
+    <script>
+      jQuery('.swatch[data-option-index="{{ option_index }}"] .{{ value | handle }}').removeClass('soldout').addClass('available').find(':radio').removeAttr('disabled');
+    </script>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% endunless %}
+
+{% endif %}
+<!-- swatches -->
+<script>
+jQuery(function() {
+  jQuery('.swatch :radio').change(function() {
+    var optionIndex = jQuery(this).closest('.swatch').attr('data-option-index');
+    var optionValue = jQuery(this).val();
+    jQuery(this)
+      .closest('form')
+      .find('.single-option-selector')
+      .eq(optionIndex)
+      .val(optionValue)
+      .trigger('change');
+  });
+});    
+$('.selector-wrapper').hide();
+</script>
+<!-- swatches -->

@@ -1,0 +1,515 @@
+<div class="product-template" id="ProductSection-{{ section.id }}" data-section-id="{{ section.id }}" data-section-type="product-template" data-enable-history-state="true">
+  <section class="single-product" itemscope itemtype="http://schema.org/Product">
+    <meta itemprop="name" content="{{ product.title }}{% unless product.has_only_default_variant %} - {{ current_variant.title }}{% endunless %}">
+    <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+    <meta itemprop="image" content="{{ product.featured_image.src | img_url: '1024x1024' }}">
+    {% comment %}
+      Get first variant, or deep linked one
+    {% endcomment %}
+
+    
+    {% assign current_variant = product.selected_or_first_available_variant %}
+    <div class="wrapper">
+
+      <header class="content-util">
+      {% include 'breadcrumb' %}
+      {% include 'social-icons' %}
+      </header>
+
+      <header class="product-header">
+        <div class="product-jump-container">
+          {% comment %}
+            If the user is on a collection product page (ie with /collections/collection-handle/products/product-handle)
+            in the URL, we can show next/previous links to other products in the collection.
+          {% endcomment %}
+          {% if collection %}
+            {% if collection.previous_product or collection.next_product %}
+              <ul class="product-jump">
+
+              {% if collection.previous_product %}
+                {% capture prev_url %}{{ collection.previous_product}}#content{% endcapture %}
+                <li class="previous">
+                  {{ 'products.general.previous_product_html' | t | link_to: prev_url }}
+                </li>
+              {% endif %}
+
+              {% if collection.next_product %}
+                {% capture next_url %}{{ collection.next_product}}#content{% endcapture %}
+                <li class="next">
+                  {{ 'products.general.next_product_html' | t | link_to: next_url }}
+                </li>
+              {% endif %}
+
+              </ul>
+            {% endif %}
+          {% endif %}
+        </div>
+
+      </header>
+
+      <div class="grid">
+        <div class="product-images thumbnails-placement-{{ section.settings.thumbnails_placement }}">
+          <div class="images-container">
+            <div class="featured {% if product.images.size == 1 %}full-width{% endif %}" id="ProductPhoto">
+              {%- assign image = current_variant.featured_image | default: product.featured_image -%}
+              {%- assign image_width = image.width | append: 'x' -%}
+              {%- assign image_highresolution = image | img_url: image_width -%}
+              <div class="featured-container featured-container-{{ section.id }} {% if section.settings.product_featured_zoom_enable %}featured-zoom{% endif %}" data-zoom="{{ section.settings.product_featured_zoom_enable }}" data-lightbox="{{ section.settings.product_featured_lightbox_enable }}">
+                <a href="" class="card__image-container">
+                  {% assign image_widths = '85,100,200,295,394,590,720,800' %}
+                  {% include 'theme-rias' %}
+                  <div class="productimage-limit" style="max-width:{{ image.width }}px">
+                    <img id="ProductImage" class="productImageZoom lazyload"
+                      src="{{ image | img_url: '394x' }}"
+                      data-zoom-image ={{ image | img_url: '1024x1024' }}
+                      data-id="{{ section.id }}"
+                      data-src="{{ image_url_pattern }}"
+                      data-widths="[{{ image_widths }}]"
+                      data-aspectratio="{{ image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-position="{{ image.position | minus: 1 }}"
+                      data-max-width="{{ image.width }}"
+                      alt="{{ image.alt | escape }}">
+                    <noscript>
+                      <img src="{{ image | img_url: '590x' }}" alt="{{ image.alt | escape }}">
+                    </noscript>
+                  </div>
+                </a>
+              </div>
+            </div>
+            {% comment %}
+              Create thumbnails if we have more than one product image
+            {% endcomment %}
+            {% unless product.images.size == 1 %}
+              <div class="thumbnails" {% if section.settings.thumbnails_placement == 'hide' %}style="display:none;"{% endif %}>
+                <ul class="productThumbZoom" id="ProductThumbs-{{ section.id }}">
+
+                  {% for image in product.images %}
+                    {%- assign image_width = image.width | append: 'x' -%}
+                    {%- assign image_highresolution = image | img_url: image_width -%}
+                    {%- assign active_image = current_variant.featured_image | default: product.featured_image -%}
+                    <li>
+                      <a href="" class="product-single__thumbnail--{{ section.id }} {% if image == active_image %}active{% endif %}" data-image-id="{{ image.id }}">
+                        {% assign image_widths = '85,100,200,295,394,590,720,800' %}
+                        {% include 'theme-rias' %}
+                        <img class="lazyload"
+                          src="{{ image | img_url: '1024x1024' }}"
+                          data-default="{{ image | img_url: '394x' }}"
+                          data-src="{{ image_url_pattern }}"
+                          data-src-pattern="{{ image_url_pattern }}"
+                          data-widths="[{{ image_widths }}]"
+                          data-aspectratio="{{ image.aspect_ratio }}"
+                          data-sizes="auto"
+                          data-position="{{ forloop.index0 }}"
+                          data-max-width="{{ image.width }}"
+                          alt="{{ image.alt | escape }}">
+                        <noscript>
+                          <img src="{{ image | img_url: '100x' }}" alt="{{ image.alt | escape }}">
+                        </noscript>
+                      </a>
+                    </li>
+                  {% endfor %}
+
+                </ul>
+              </div>
+            {% endunless %}
+          </div>
+        </div>
+
+        <aside class="product-aside">
+          <div class="purchase-box {% if section.settings.product_box_padding %}padding-box{% endif %}" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+            <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+            <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+            {% comment %}
+              ID addToCartForm is a selector for the ajax cart plugin
+            {% endcomment %}
+            <form action="/cart/add" method="post" enctype="multipart/form-data" id="AddToCartForm" class="form-vertical product-form product-form-{{ section.id }}" data-section="{{ section.id }}">
+
+              <div class="product-title">
+                <h1 itemprop="name">{{ product.title }}</h1>
+                {% if section.settings.show_vendors %}
+                  <span class="vendor">{{ product.vendor | link_to_vendor }}</span>
+                {% endif %}
+              </div>
+
+              <div class="selection-wrapper price product-single__price-{{ section.id }}">
+                <span class="money" id="ProductPrice-{{ section.id }}" itemprop="price" content="{{ current_variant.price | money_without_currency | remove: ',' }}">{{ current_variant.price | money }}</span>
+         
+ 
+  
+                {% if current_variant.compare_at_price > current_variant.price %}
+                  <p id="ComparePrice-{{ section.id }}" style="display:block;">
+
+                    {{ 'products.product.compare_at' | t }} <span class="money">{{ current_variant.compare_at_price | money }}</span>
+                  </p>
+                {% else %}
+                  <p id="ComparePrice-{{ section.id }}" style="display:none;">
+                    {{ 'products.product.compare_at' | t }} <span class="money">{{ current_variant.compare_at_price | money }}</span>
+                  </p>
+                {% endif %}
+                
+                 <!-- Billease Calculator -->
+            
+<script>
+                
+    function start() {
+    const marketing_link = 'https://platinumkaraoke.com/pages/billease';  
+    const installments = 3; 
+    const dp_pct = 0;
+    const is_zero_interest = false; 
+    const price = {{current_variant.price}} / 100;
+    const billease_logo = `<img class="cutsom-billease" src="https://s3-ap-southeast-1.amazonaws.com/static.billease.ph/public/billease-logo.svg" width="50"/>`;
+    const storage_key = 'BILLEASE_INSTALLMENT_FACTOR';
+    const learn_more = `<a class="custom-learn-more" target="_self" href="${marketing_link}" style="text-decoration: underline; color: #203AA9">Learn More</a>`;
+    function round_up(val) {
+      return val % 100 === 0 ? val : (val + 100) - (val % 100);
+    }
+    function insert_billease_text(installment_factor = null) {
+      const cashout = dp_pct ? round_up(price * (dp_pct / 100)) : 0;
+      const financed_amount = price - cashout;
+      const amount = Math.ceil(installment_factor ? (installment_factor[installments] * financed_amount) : (financed_amount / installments));
+      const billease_text = document.createElement('div');
+      billease_text.classList.add('custom-div-billease');
+      const billease_script = document.currentScript;
+      const zero_interest = installment_factor ? '' : '<strong> 0% interest</strong>';
+      let installment_text;
+      if (cashout) {
+        installment_text = `Or pay <strong>₱${cashout.toLocaleString()} upfront</strong>, the rest in <strong>${installments} months</strong>`;
+      } else {
+        installment_text = `Or <strong>${installments} installments</strong>`;
+      }
+      billease_text.innerHTML = `<span style="vertical-align: middle">${installment_text} for only <strong>₱${amount.toLocaleString()}</strong> with ${billease_logo}${zero_interest}. ${learn_more}</span>`;
+      billease_script.parentNode.insertBefore(billease_text, billease_script.nextSibling);
+    }
+    if (is_zero_interest) {
+      insert_billease_text();
+    } else {
+      const billease_installment_factor = localStorage.getItem(storage_key);
+      if (billease_installment_factor) {
+        insert_billease_text(JSON.parse(billease_installment_factor));
+      } else {
+        fetch('https://billease.ph/billease_installments.json')
+            .then(response => response.json())
+            .then(data => {
+              localStorage.setItem(storage_key, JSON.stringify(data.installment_factor));
+              insert_billease_text(data.installment_factor);
+            });
+      }
+    }
+  }
+  start();
+</script>                              
+                
+<!-- Billease Calculator end -->      
+              </div>
+  
+              
+              
+              
+
+              {% comment %}
+                Collection of variant options
+              {% endcomment %}
+              {% unless product.has_only_default_variant %}
+                <div class="selection-wrapper variant js">
+                  <div class="variant-grid">
+                    {% for option in product.options_with_values %}
+                      <div class="selector-wrapper">
+                        <label for="SingleOptionSelector-{{ forloop.index0 }}">
+                          {{ option.name }}
+                        </label>
+
+                        <select class="single-option-selector single-option-selector-{{ section.id }}" id="SingleOptionSelector-{{ forloop.index0 }}" data-name="{{ option.name }}" data-index="option{{ forloop.index }}">
+                          {% for value in option.values %}
+                            <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
+                              {{ value }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endunless %}
+
+              {% comment %}
+                Primary variant select controlled JS
+              {% endcomment %}
+              <div class="selection-wrapper variant no-js">
+                <div class="selector-wrapper full-width">
+                  <select name="id" id="ProductSelect-{{ section.id }}" data-section="{{ section.id }}" class="product-form__variants no-js">
+                    {% for variant in product.variants %}
+                      {% if variant.available %}
+                        <option {% if variant == product.selected_or_first_available_variant %} selected="selected" {% endif %} value="{{ variant.id }}" data-sku="{{ variant.sku }}">
+                          {{ variant.title }} - {{ variant.price | money_with_currency }}
+                        </option>
+                      {% else %}
+                        <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="error cart-error cart-error-{{ section.id }}"></div>
+              <div class="selection-wrapper cart">
+                {% if section.settings.product_quantity_enable %}
+                  <div class="selector-wrapper quantity quantity-{{ section.id }}" {% unless current_variant.available %}style="display:none;"{% endunless %}>
+                    <label for="Quantity">{{ 'products.product.quantity' | t }}</label>
+                    <div class="quantity-select quantity-select-{{ section.id }}">
+                      <div class="button-wrapper">
+                        <button class="adjust adjust-minus">-</button>
+                      </div>
+                      <div class="input-wrapper">
+                        <input type="text" class="quantity" value="1" min="1" pattern="[0-9]*" name="quantity" id="Quantity">
+                      </div>
+                      <div class="button-wrapper">
+                        <button class="adjust adjust-plus">+</button>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="button-wrapper">
+                  <button type="submit" name="add" id="AddToCart-{{ section.id }}" class="button solid {% unless current_variant.available %}disabled{% endunless %}" {% unless current_variant.available %}disabled{% endunless %}>
+                    <span id="AddToCartText-{{ section.id }}">
+                      {% unless current_variant.available %}
+                        {{ 'products.product.sold_out' | t }}
+                      {% else %}
+                        {{ 'products.product.add_to_cart' | t }}
+                      {% endunless %}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+         <div class="wishy-placeholder"></div>
+          {% if section.settings.show_share_buttons %}
+            {% include 'social-share' %}
+          {% endif %}
+          
+          <div class="pic1">
+            <img src="https://cdn.shopify.com/s/files/1/2581/7224/files/digital_songbook.png?14339516088236053642 " height="110px" width="100px">
+          </div>
+          
+          <a href="https://itunes.apple.com/ph/app/the-platinum-karaoke/id658194590?mt=8" target="_blank">
+     			<div class="pic2"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/apple-Store-logo.png?14339516088236053642" height="90px" width="90px"></div>
+  			</a>
+     		
+          	<a href="https://play.google.com/store/apps/details?id=com.platinumkaraoke.digitalsongbook" target="_blank">
+   				<div class="pic3"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/googleplay-logo.png?14339516088236053642 " height="90px" width="90px"></div>
+  			</a>
+        
+          <a href="https://appgallery.cloud.huawei.com/uowap/index.jsp?appName=Platinum+Digital+Songbook&logo=https%3A%2F%2Fappimg2.dbankcdn.com%2Fhwmarket%2Ffiles%2Fapplication%2Ficon144%2F65%2Fcf3e20e1022b4b4dab1acec2ed66384e.png&desc=Huawei+AppGallery#/detailApp/C101422141?source=appshare&subsource=C101422141&locale=en_US" target="_blank">
+     			<div class="pic4"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/HUWAEI-APP-GALLERY-LOGO.png?v=1585646583" height="90px" width="90px"></div>
+  			</a>
+
+        <style>
+          .tb1{background-color:green;
+          
+          }
+          
+          
+           .pic2 img{
+          background-color:pink;
+             float:left;
+              bottom: 100px;
+            left:100px;
+            position: relative;
+           }
+     
+           .pic3 img{
+          background-color:pink;
+             bottom:70px;
+             left:10px;
+            position: relative;
+           }
+              .pic4 img{
+         	 background-color:pink;
+             bottom: 66px;
+  		 	 left: 100px;
+   			 position: relative;
+           }
+     
+          
+            </style>
+        
+       
+        
+        </aside>
+      </div> 
+
+          <div class="description rte" itemprop="description">
+            {{ product.description }}
+            <div id="shopify-product-reviews" data-id="{{product.id}}">{{ product.metafields.spr.reviews }}</div>
+    </div>
+       </div>
+  </section>
+
+  {% comment %}
+    Related products
+  {% endcomment %}
+  {% for block in section.blocks %}
+    <div class="product-block-container" {{ block.shopify_attributes }}>
+      {% case block.type %}
+        {% when 'related_products' %}
+          <div class="block-container">
+            {% include 'related-products' %}
+          </div>
+
+        {% when 'product_collection'}
+          {%- assign product_collection_count = '4' -%}
+          {%- assign collection_count = '4' -%}
+          <div class="simple-collection layout-{{ collection_count }}">
+            <div class="wrapper">
+              <header>
+                {% if block.settings.title != blank %}
+                  <h4>{{ block.settings.title | escape }}</h4>
+                {% endif %}
+                {% if block.settings.button_link != blank and block.settings.button_label != blank %}
+                  <a href="{{ block.settings.button_link }}" class="button outline">{{ block.settings.button_label | escape }}</a>
+                {% endif %}
+              </header>
+              <div class="product-container">
+                {%- assign collection = collections[block.settings.collection] -%}
+                {%- assign product_limit = collection_count -%}
+                {% for product in collection.products limit: product_limit  %}
+                  {% include 'product-grid-item' %}
+                {% else %}
+                  {% for i in (1..product_limit) %}
+                    {% include 'placeholder-product-grid-item' %}
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+      {% endcase %}
+    </div>
+  {% endfor %}
+
+</div>
+{% unless product.empty? %}
+  <script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+  </script>
+{% endunless %}
+
+
+  
+  
+  
+{% schema %}
+{
+  "name": "Product pages",
+  "settings": [
+    {
+      "type": "select",
+      "id": "thumbnails_placement",
+      "label": "Thumbnails placement",
+      "options": [
+        {
+          "value": "side",
+          "label": "Side"
+        },
+        {
+          "value": "below",
+          "label": "Below"
+        },
+        {
+          "value": "hide",
+          "label": "Hide"
+        }
+      ],
+      "default": "side"
+    },
+    {
+      "type": "checkbox",
+      "id": "product_quantity_enable",
+      "label": "Show quantity selector",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendors",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "product_featured_zoom_enable",
+      "label": "Enable image zoom",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "product_featured_lightbox_enable",
+      "label": "Enable image lightbox",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "product_box_padding",
+      "label": "Show product details background",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": "Show social sharing buttons",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "related_products",
+      "name": "Related products",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Related Products"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "View more"
+        }
+      ]
+    },
+    {
+      "type": "product_collection",
+      "name": "Product Collection",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Simple collection"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "View more"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "id": "collection",
+          "type": "collection",
+          "label": "Collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

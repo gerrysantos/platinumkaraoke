@@ -1,0 +1,434 @@
+
+
+  <header class="util">
+  <div class="container_top">
+   
+  <div class="deskstop_top2">
+
+  <i class="fa fa-envelope-o"style="font-size:16px;"></i>
+    <a href="mailto:services@platinumkaraoke.com"><p6> services@platinumkaraoke.com </p6></a>
+
+  <i class="fa fa-mobile" style="font-size:16px"></i>
+    <p6>(+63) 939-249-7210 | (+63) 917-591-4263</p6>
+ <i class="fa fa-search  w3-medium"></i>
+    
+    </div>
+    
+<div class="mobile_top2">
+ 
+</div>
+
+   
+    
+    <div id="top3">
+         {% include 'search-bar' %}
+     
+  
+       
+        
+    </div>
+    
+    
+   
+  
+     <div id="top4">
+    
+        <a href="/cart" id="CartButton">
+      
+        <span class="icon-fallback-text">
+          <span class="icon icon-cart" aria-hidden="true"></span>
+        </span>
+        <span id="CartCount">{{ cart.item_count }}</span>
+        {{ 'layout.cart.title' | t }}
+        <span id="CartCost" class="money">{% unless cart.item_count == 0 %}{{ cart.total_price | money }}{% endunless %}</span>
+
+      </a>
+      {% if settings.ajax_cart_enable %}
+        {% include 'cart-preview' %}
+      {% endif %}
+       
+    
+    </div>
+  </div>
+    
+ 
+  <div class="wrapper">
+
+ 
+    <div class="left-wrapper">
+      <ul class="text-links">
+        <li class="mobile-menu">
+          <a href="#menu" class="toggle-menu menu-link">
+            <span class="icon-text">
+              <span class="icon icon-menu" aria-hidden="true"></span>
+              <span class="text" data-close-text="{{ 'layout.drawers.close_menu' | t }}">{{ 'layout.navigation.menu' | t }}</span>
+            </span>
+          </a>
+        </li>
+        
+      <a href="https://www.facebook.com/ThePlatinumKaraoke/" target="_blank">
+    <img id="social1"  src="https://cdn.shopify.com/s/files/1/2581/7224/files/iconfinder_Facebook_194929-footer.png?v=1547628788">
+        </a>	
+   
+      <a href="https://www.instagram.com/theplatinumkaraoke/" target="_blank">
+    <img id="social1"  src="https://cdn.shopify.com/s/files/1/2581/7224/files/iconfinder_Intsagram_194923-footer.png?v=1547628750">
+        </a>
+        
+      <a href="https://twitter.com/PlatinumKRK" target="_blank">
+    <img id="social1"  src="https://cdn.shopify.com/s/files/1/2581/7224/files/iconfinder_Twitter_194909-footer.png?v=1547628750">
+        </a>
+        
+               
+      <a href="https://www.youtube.com/c/PlatinumKaraokeOfficial" target="_blank">
+    <img id="social1"  src="https://cdn.shopify.com/s/files/1/2581/7224/files/iconfinder_YouTube_194904-footer.png?v=1547628938">
+        </a>
+      
+    
+        <li>    
+    
+        </li>
+    </ul>
+   
+      {% comment %}
+        Include currency picker
+      {% endcomment %}
+      {% if settings.show_multiple_currencies %}
+       {% include 'currency-picker' %}
+      
+      
+      {% endif %}
+      
+    </div>
+    
+    <div class="center-wrapper">
+      <span></span>
+    
+<a href="https://www.platinumkaraoke.com/"><img src="https://cdn.shopify.com/s/files/1/2581/7224/files/the-platinum-karaoke-logo-v2_5595fc91-fc3e-40c2-bc26-7dbd4d629ea4.png?13671" height="150px" width="180px">
+  </div></a>
+ 
+    <div class="right-wrapper">
+          
+     
+      {% comment %}
+        If customer accounts are enabled, provide login and create account links
+      {% endcomment %}
+      {% if shop.customer_accounts_enabled %}
+        {% include 'accounts-nav' %}
+      {% endif %}
+      {% comment %}
+        Show number of items in the cart and total cost in the /cart link
+      {% endcomment %}
+ 
+   
+
+        </div>
+    </div>
+</header>
+
+<style>
+  
+  .fa-envelope-o:before {
+    content: "\f003";
+    color: #d90808;
+    font-size: 14px;
+}
+  
+  .fa-phone:before {
+    content: "\f095";
+    color: #d90808;
+}
+  
+  .fa-mobile:before {
+        color: #d90808;
+  }
+  
+  
+header.util .wrapper .left-wrapper, header.util .wrapper .right-wrapper {
+    margin: 14px 20px !important;
+}
+
+
+  
+  
+  /* header-Logo  */
+
+header.util .center-wrapper img {
+  
+      filter: invert(1) brightness(10);
+}
+  	
+  
+  
+  .site-nav .right-wrapper {
+    background-color: #fff;
+    box-shadow: 2px 2px 2px #ededed;
+}
+ util { 
+      z-index: 991;
+    position: sticky;
+    top: 0px;
+ }
+   
+ .container_top{ display: flex;
+  flex-flow: row nowrap; /* Align on the same line */
+ 
+  
+    text-decoration: none;
+   
+/*    edited by Moncel */
+/*     text-shadow: 0 1px 0 #000; */
+     text-shadow:none;
+    border-right: 1px solid #323235;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+           
+    
+       box-shadow: 0px 0px 12px 0px black;     
+    background:rgba(150, 150, 150, 0.2);
+    box-shadow: inset 0 -1px 1px rgba(0,0,0,0.5);
+     padding:2px;
+     word-spacing: 5px;
+    }
+  
+  
+  #social1{
+    border:solid 5px gray;
+/*     background:#f5f5f5; */
+
+  }
+  
+  
+  i{padding: 1px;
+    color:gray;
+
+  bottom:2px;}
+  
+  
+/*  edited by Moncel  */
+  
+  .container_top{
+    width:100%;
+    text-align:center;
+    background-color: #fff;
+  
+    
+}
+
+.deskstop_top2{
+/*     float:left;
+    width:35%;
+    margin-right:130px;
+    padding:10px; */
+  
+/*   edited by Moncel */
+     float: left;
+    width: 33.3%;
+    padding: 10px;
+    margin: 0 auto;
+    padding-top: 12px;
+  
+    
+}
+  
+  
+ .deskstop_top2
+{
+
+display: block;
+  
+
+}
+  
+  
+.mobile_top2
+{
+display: none;
+}
+@media screen and (max-width:1500px)
+{
+.deskstop_top2
+{
+/* display: none; */
+/*   edited by Moncel */
+  display: block;
+
+}
+.mobile_top2
+{
+display: block;
+}
+
+}
+
+  #top3 {
+/*     float:right;
+    width:50%;
+    padding:2px;
+     @include clearfix();
+       padding-top:5px;
+    margin-left:20px;
+      */
+    
+/*     edited by Moncel */
+        float: right;
+    width: 33.3%;
+    padding: 2px;
+    @include clearfix(): ;
+    padding-top: 5px;
+    margin-left: 20px;
+    
+      
+   
+}
+  
+  
+  #top4{
+  
+/*   display: inline-block;
+    width:50%;
+     @include clearfix();
+     margin:3px;
+    padding:5px; */
+    
+/*     edited by Moncel */
+        display: inline-block;
+    width: 33.3%;
+    @include clearfix(): ;
+    margin: 3px;
+    padding: 5px;
+     
+  }
+  
+  
+  .fa-search{
+/*     position:relative;
+     top:2px;
+     left:642px;
+     clear:both;
+     color:white; */ 
+/*     edited by Moncel */
+    position: relative;
+    top: 2px;
+    left: 540px;
+    clear: both;
+    color: white;
+       }
+  
+/*   edited by Moncel */
+  
+  .container_top p6 {
+    color:#000;
+    font-size: 10px;
+  }
+  
+/*   header background and elements*/
+  header.util .wrapper {
+
+    background: #d90808;
+}
+  
+  header.util .currency-picker-contain {
+
+    color: #fff;
+    border-left: 1px solid #fff;
+
+}
+  
+  header.util li a {
+    display: inline-block;
+    padding: 4px 6px;
+    color: #fff;
+}
+  
+  .site-nav .right-wrapper {
+    background-color: #fff;
+}
+  
+  @media only screen and (max-width:480px) {
+
+/* HEADER */
+    
+header.util .wrapper {
+    padding: 10px !important;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+header.util .wrapper .left-wrapper {
+    width: 100%;
+    float: none;
+    clear: both;
+    text-align: center;
+    order: 2;
+}
+
+header.util .center-wrapper {
+    width: 100%;
+    text-align: center;
+    order: 1;
+}
+
+header.util .left-wrapper {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+    
+header.util .right-wrapper {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    display: none;
+}
+    
+    
+    
+    #top3 {
+  
+    width: 50%;
+
+}
+    #top4 {
+
+    width: 50%;
+
+}
+    
+    header.util .wrapper .left-wrapper, header.util .wrapper .right-wrapper {
+    margin: 0 auto !important;
+      width: 100%;
+      padding: 5px 0px;
+}
+
+    header.util .currency-picker-contain {
+
+      margin-left: 3px;
+      padding: 2.5px 6px;
+      
+    }
+    
+    .deskstop_top2
+{
+/* display: none; */
+/*   edited by Moncel */
+  display: none;
+
+}
+    
+    
+}
+
+}
+  
+  
+
+
+
+    
+  
+  </style>
+   

@@ -1,0 +1,85 @@
+{{ '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' | stylesheet_tag }}
+{{ '//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css' | stylesheet_tag }}
+{{ 'wc-quickview.css' | asset_url | stylesheet_tag }}
+
+<div class="custome_modal_start" id="product_quickview_id">
+  <div class="quickview_outer_padding_cls">
+    <div class="quickview_inner_start">
+      <div class="close_pop_up_cls">
+        <a href="javascript:void(0)" id="close_quickview_popup"><em class="fa fa-times"></em></a>
+      </div>
+      <img src="{{ 'loader_call_img.gif' | asset_url }}" class="loader_img_cls" alt="loader_img" />
+      <div class="custom_6_col_cls">
+        <div class="product-main-image quickview_product_main_img">
+          <ul class="slider-for quickview_large_img_ul"> 
+            <li>
+              <figure class="product_main_img_cls"></figure>
+            </li>
+          </ul>
+          <ul class="slider-nav poplet quickview_poplet_img_ul"></ul>
+        </div>
+      </div>
+      <div class="custom_6_col_cls">
+        <div class="quickview_product_desc_cls">
+          <h2 class="product_title"><a href=""></a></h2>
+          <div class="wc_product_rating_cls" ></div>
+          <div class="price-box quickview_product_price price-part">
+            <span class="price-box__new"></span>
+            <span class="main price-box__old"></span>
+          </div>
+          <div class="quickview_product_desc">
+            <div class="product-info__description"></div>
+          </div>
+          <div class="product-available">
+            <form id="add_to_cart_form" action="/cart/add" method="post">
+              <div class="variants"></div>
+              <div class="wrapper">
+                <div class="quickview_quntity_cls">
+                  <input type="number" id="Quantity" class="product_qty_input" name="quantity" value="1" min="1">
+                  <button class="quickview_add_to_cart_btn addtocartqv" id="add_to_cart_btn_id" type="submit">Add to Cart</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="quickview_full_info_div">
+            <div class="product-disable">
+              <button disabled class="quickview_unavialable_btn">Sold Out</button>
+            </div>
+            <a href="#" class="quickview_fullinfo">View Detail</a>
+          </div>
+          <div class="quickview_social_sharing">
+            <ul>
+              <li class="social_app_icon"><a target="_blank" href="" class="facebook_share_url"><em class="fa fa-facebook"></em></a></li>
+              <li class="social_app_icon"><a target="_blank" href="" class="twitter_share_url"><em class="fa fa-twitter"></em></a></li>
+              <li class="social_app_icon"><a target="_blank" href="" class="pinterest_share_url"><em class="fa fa-pinterest-p"></em></a></li>
+              <li class="social_app_icon"><a target="_blank" href="" class="google_share_url"><em class="fa fa-google-plus"></em></a></li>
+            </ul>
+          </div>
+          <div class="quickview_added_product_cls">
+            <p>Item added to cart! <a href="/cart">View Cart</a>.</p>
+          </div>
+          <div class="quickview_error_cls"><p></p></div>
+        </div>
+      </div>
+      <div class="error_msg_div_id"></div>
+      <div class="company_name_cls">
+        
+      </div>
+    </div>
+  </div>
+  <div id="shop_url_id" style="display:none !important">{{ shop.url }}</div>
+  <div id="shop_price_format" style="display:none !important">{{ shop.money_format }}</div>
+</div>
+
+<div class="quickViewModal_info" style="display:none;">
+  <div class="button">Add to Cart</div>
+  <div class="button_added">Added to Cart</div>
+  <div class="button_error">Error</div>
+  <div class="button_wait">Wait</div>
+</div>
+
+<script>window.jQuery || document.write('<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js">\x3C/script>')</script>
+{{ 'option_selection.js' | shopify_asset_url | script_tag }}
+{{ 'api.jquery.js' | shopify_asset_url | script_tag }}
+{{ '//cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.js' | script_tag }}
+{{ 'wc-quickview.js' | asset_url | script_tag }}

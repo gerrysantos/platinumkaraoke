@@ -1,0 +1,64 @@
+<!-- /snippets/search-bar.liquid -->
+{% comment %}
+  A snippet to include a search bar anywhere in your theme.
+  Note we are using 'input-group' for the layout. Look under Forms > Input Groups for some demos.
+
+  More information:
+   - http://docs.shopify.com/themes/liquid-variables/search
+
+  To return only products in results:
+    - http://docs.shopify.com/manual/configuration/store-customization/return-only-product-in-storefront-search-results
+    - Or manually add type=product to the search URL as a query parameter
+    - Uncomment hidden input with value="product" below
+{% endcomment %}
+
+<form action="/search" method="get" class="s_form" role="search">
+  <div class="input-wrapper">
+    <input
+      type="search"
+      id="s_top"
+      name="q"
+      value="{{ search.terms | escape }}"
+      placeholder="{{ 'general.search.placeholder' | t }}"
+      class="input-group-field"
+      aria-label="{{ 'general.search.placeholder' | t }}"
+    >
+  </div>
+  <div class="button-wrapper">
+    <span class="input-group-btn">
+      <!-- <button type="button" class="btn icon-fallback-text"> -->
+      <!--
+        <span class="icon icon-close" aria-hidden="false"></span>
+          <span class="fallback-text">{{ 'layout.drawers.close_menu' | t }}</span>
+        </button>
+      -->
+    </span>
+  </div>
+</form>
+
+<style>
+  .input-wrapper #s_top {
+     width:100%;
+     background:rgba(50, 50, 50, 0.2);
+     border: medium none;
+     border-radius: 50px;
+     color:white;
+     font-size:15x;
+     padding:5px;
+     -webkit-box-shadow: 0px 0px 1px 0px #888;
+     text-align:center ;
+     border-right:solid 5px transparent;
+  }
+
+  .input-wrapper #s_button{
+    border:2px solid #207cca;
+    background-color:#207cca;
+    color:#fafafa;
+    border-radius:5px 5px 5px 5px ;
+    position:relative;
+    float:right;
+
+    }
+  .s_form{ border-radius:2px;
+    border:0px solid gray;}
+</style>

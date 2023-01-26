@@ -1,0 +1,142 @@
+<div id="easysearch-container">
+  <div id="easysearch-holder" class="easysearch-holder easysearch-loading easysearch-vertical-mode">
+        
+          <div class="easysearch-select-holder">
+        <label for="easysearch_field_4865">
+          State                  </label>
+        <select id="easysearch_field_4865" data-sort-order="1" disabled>
+          <option value=''>Select State</option>
+        </select>
+      </div>
+          <div class="easysearch-select-holder">
+        <label for="easysearch_field_4866">
+          Province                  </label>
+        <select id="easysearch_field_4866" data-sort-order="0" disabled>
+          <option value=''>Select Province</option>
+        </select>
+      </div>
+          <div class="easysearch-select-holder">
+        <label for="easysearch_field_4867">
+          Barangay                  </label>
+        <select id="easysearch_field_4867" data-sort-order="0" disabled>
+          <option value=''>Select Barangay</option>
+        </select>
+      </div>
+    
+    
+          <div class="easysearch-btn-holder">
+        <label for="easysearch-search"></label>
+        <a href="javascript:void(0);" id="easysearch-search" class="easysearch-btn" target="_self" disabled
+           style='background: #0077cc !important;'>
+            Search        </a>
+      </div>
+    
+    
+          <div class="easysearch-preload-loader">
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+          <rect x="0" y="13" width="4" height="5" fill="#bbb">
+            <animate attributeName="height" attributeType="XML"
+              values="5;21;5"
+              begin="0s" dur="0.6s" repeatCount="indefinite" />
+            <animate attributeName="y" attributeType="XML"
+              values="13; 5; 13"
+              begin="0s" dur="0.6s" repeatCount="indefinite" />
+          </rect>
+          <rect x="10" y="13" width="4" height="5" fill="#bbb">
+            <animate attributeName="height" attributeType="XML"
+              values="5;21;5"
+              begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+            <animate attributeName="y" attributeType="XML"
+              values="13; 5; 13"
+              begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+          </rect>
+          <rect x="20" y="13" width="4" height="5" fill="#bbb">
+            <animate attributeName="height" attributeType="XML"
+              values="5;21;5"
+              begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+            <animate attributeName="y" attributeType="XML"
+              values="13; 5; 13"
+              begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+          </rect>
+        </svg>
+      </div>
+      </div>
+
+  {% unless easysearchIncluded  %}
+    <link rel="stylesheet" type="text/css" href='//static.nexusmedia-ua.com/easysearch/externals/frontend/plugin.css' />
+    <script type="text/javascript">
+      document.addEventListener = document.addEventListener || function(e, f){ document.attachEvent('on' + e, f); };
+      document.addEventListener('easysearch_init', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        easysearch.dbSRC = "//cdn.shopify.com/s/files/1/1101/5888/t/2/assets/platinumkaraoke-ph_myshopify_com_database.csv?81220";
+        easysearch.tree = {};
+
+        easysearch.jq(document).ready(function() {
+          
+          easysearch.jq('body').on('change', 'div[id=easysearch-holder] select, div[class*=easysearch-holder] select', function(event) {
+            var $holder = easysearch.jq(this).parent().closest('#easysearch-holder, .easysearch-holder');
+            var $container = easysearch.jq(this).parent().closest('.easysearch-select-holder');
+            var $nextSelContainers = $container.nextAll('.easysearch-select-holder');
+            var $prevSelContainers = $container.prevAll('.easysearch-select-holder');
+            var $btn = $holder.find('#easysearch-search');
+
+            // prev selects
+            var index = '';
+            if( $prevSelContainers.length ) {
+              $prevSelContainers = $prevSelContainers.get().reverse();
+              easysearch.jq.each($prevSelContainers, function(i, el){
+                index += easysearch.jq(el).find('select').val() + ',';
+              });
+            }
+            index += easysearch.jq(this).val() + ',';
+
+            // next selects
+            var nextIndex = index;
+            if( $nextSelContainers.length ) {
+              easysearch.jq.each($nextSelContainers, function(i, el){
+                var $sel = easysearch.jq(el).find('select');
+                $sel.children('option:first').nextAll().remove();
+                $sel.attr('disabled', true);
+
+                if( typeof easysearch.tree[nextIndex] !== 'undefined' && typeof easysearch.tree[nextIndex][0] !== 'undefined' ) {
+                  easysearch.fillSelect($sel, nextIndex);
+                }
+
+                $sel.trigger('easysearch_select_change'); // API method for custom selects
+                nextIndex += ',';
+              });
+            }
+
+            easysearch.curIndex = nextIndex;
+            $holder.data('searchparams', nextIndex);
+
+            if( typeof easysearch.tree[nextIndex] !== 'undefined' && typeof easysearch.tree[nextIndex][0] !== 'undefined' && easysearch.tree[nextIndex][0] ) {
+              var gotoUrl = easysearch.tree[nextIndex][0];
+                              gotoUrl = easysearch.collectionUrlHandleChecker( gotoUrl );
+              
+              
+                            if( $btn.length ) $btn.attr('disabled', false).attr('href', gotoUrl).attr('onclick', "easysearch.saveSearchParams(this);");
+
+            } else {
+              if( $btn.length ) {
+                $holder.removeData('search_params');
+                $btn.attr('disabled', true).attr('href', 'javascript:void(0);').removeAttr('onclick');
+              }
+            }
+          });
+
+          easysearch.initSearchTree(false, false);
+        });
+      });
+    </script>
+
+    <style type="text/css">
+      .easysearch-item-selector + *, .easysearch-item[data-tags] { display: none; }
+
+          </style>
+  {% endunless %}
+</div>
+{% assign easysearchIncluded = true %}

@@ -1,0 +1,19 @@
+{% comment %}
+Do NOT change this file.
+{% endcomment %}
+
+<script>
+  window.bm_product = [];
+  {% if product %}
+  try{
+    window.bm_product = {{ product | json }};
+    window.bm_product.options = {{ product.options_with_values | json }};
+  }
+  catch(err){
+  }
+  {% endif %}
+</script>
+
+<!-- Main Script DON'T REMOVE THIS START -->
+<script async src="https://buy-me.makeprosimp.com/app/js/app.js?shop=platinumkaraoke-ph.myshopify.com&key=b3fb91b2c2294bd1ab39714d3d953bfa"></script>
+<!-- Main Script DON'T REMOVE THIS END -->
